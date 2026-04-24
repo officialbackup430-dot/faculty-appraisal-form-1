@@ -1,0 +1,758 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Faculty Self-Appraisal Form</title>
+<link href="https://fonts.googleapis.com/css2?family=Lora:wght@400;600&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --ink: #1a1a2e;
+    --ink-light: #4a4a6a;
+    --accent: #2d4a8a;
+    --accent-light: #e8edf8;
+    --accent-mid: #c0cfe8;
+    --border: #c8cfe0;
+    --surface: #f7f8fc;
+    --white: #ffffff;
+    --success: #1a6e3c;
+    --success-bg: #e8f5ee;
+    --warn: #8a4a00;
+    --warn-bg: #fff3e0;
+    --danger: #8a1a1a;
+    --danger-bg: #fce8e8;
+  }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: #eef0f8;
+    color: var(--ink);
+    min-height: 100vh;
+    padding: 0;
+  }
+
+  .page-header {
+    background: var(--accent);
+    color: white;
+    padding: 2rem 2.5rem 1.5rem;
+    position: relative;
+    overflow: hidden;
+  }
+  .page-header::after {
+    content: '';
+    position: absolute;
+    bottom: -1px;
+    left: 0; right: 0;
+    height: 24px;
+    background: #eef0f8;
+    clip-path: ellipse(55% 100% at 50% 100%);
+  }
+  .page-header h1 {
+    font-family: 'Lora', serif;
+    font-size: 1.6rem;
+    font-weight: 600;
+    letter-spacing: -0.02em;
+  }
+  .page-header p {
+    font-size: 0.88rem;
+    opacity: 0.8;
+    margin-top: 0.3rem;
+  }
+
+  .form-container {
+    max-width: 860px;
+    margin: 0 auto;
+    padding: 1.5rem 1.25rem 3rem;
+  }
+
+  .section-card {
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    margin-bottom: 1.25rem;
+    overflow: hidden;
+  }
+
+  .section-header {
+    background: var(--accent-light);
+    border-bottom: 1px solid var(--accent-mid);
+    padding: 0.75rem 1.25rem;
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+  }
+  .section-header .icon {
+    width: 28px; height: 28px;
+    background: var(--accent);
+    border-radius: 6px;
+    display: flex; align-items: center; justify-content: center;
+    color: white;
+    font-size: 13px;
+    flex-shrink: 0;
+  }
+  .section-header h2 {
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: var(--accent);
+    letter-spacing: 0.01em;
+  }
+
+  .section-body { padding: 1.25rem; }
+
+  .field-row {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+    margin-bottom: 1rem;
+  }
+  .field-row.cols-1 { grid-template-columns: 1fr; }
+  .field-row.cols-2 { grid-template-columns: 1fr 1fr; }
+  .field-row.cols-3 { grid-template-columns: 1fr 1fr 1fr; }
+
+  .field-group {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+  .field-group label {
+    font-size: 0.78rem;
+    font-weight: 500;
+    color: var(--ink-light);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+  .field-group input,
+  .field-group select,
+  .field-group textarea {
+    width: 100%;
+    border: 1px solid var(--border);
+    border-radius: 7px;
+    padding: 0.5rem 0.75rem;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.875rem;
+    color: var(--ink);
+    background: var(--surface);
+    transition: border-color 0.15s, box-shadow 0.15s;
+    outline: none;
+  }
+  .field-group input:focus,
+  .field-group select:focus,
+  .field-group textarea:focus {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px rgba(45,74,138,0.1);
+    background: white;
+  }
+
+  /* Dynamic table rows */
+  .dyn-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.82rem;
+    margin-top: 0.5rem;
+  }
+  .dyn-table th {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    padding: 0.5rem 0.6rem;
+    text-align: left;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--ink-light);
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    white-space: nowrap;
+  }
+  .dyn-table td {
+    border: 1px solid var(--border);
+    padding: 0;
+  }
+  .dyn-table td input,
+  .dyn-table td select {
+    width: 100%;
+    border: none;
+    border-radius: 0;
+    padding: 0.45rem 0.55rem;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.82rem;
+    background: transparent;
+    color: var(--ink);
+    outline: none;
+  }
+  .dyn-table td input:focus,
+  .dyn-table td select:focus {
+    background: var(--accent-light);
+    box-shadow: inset 0 0 0 2px var(--accent);
+  }
+  .dyn-table td.sr-cell {
+    text-align: center;
+    color: var(--ink-light);
+    font-size: 0.78rem;
+    font-weight: 500;
+    padding: 0.45rem 0.3rem;
+    background: var(--surface);
+    width: 32px;
+  }
+  .dyn-table td.del-cell { width: 32px; text-align: center; }
+  .del-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: #cc4444;
+    font-size: 15px;
+    line-height: 1;
+    padding: 4px;
+    border-radius: 4px;
+  }
+  .del-btn:hover { background: var(--danger-bg); }
+
+  .add-row-btn {
+    margin-top: 0.6rem;
+    background: none;
+    border: 1px dashed var(--accent-mid);
+    border-radius: 7px;
+    padding: 0.4rem 0.9rem;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.82rem;
+    color: var(--accent);
+    cursor: pointer;
+    transition: background 0.15s;
+    font-weight: 500;
+  }
+  .add-row-btn:hover { background: var(--accent-light); }
+
+  .submit-area {
+    text-align: center;
+    padding: 1rem 0 0;
+  }
+  .submit-btn {
+    background: var(--accent);
+    color: white;
+    border: none;
+    border-radius: 9px;
+    padding: 0.85rem 2.5rem;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.15s, transform 0.1s;
+    letter-spacing: 0.01em;
+  }
+  .submit-btn:hover { background: #1e3570; }
+  .submit-btn:active { transform: scale(0.98); }
+  .submit-btn:disabled { background: #8899bb; cursor: not-allowed; }
+
+  .toast {
+    position: fixed;
+    bottom: 1.5rem;
+    left: 50%;
+    transform: translateX(-50%) translateY(80px);
+    background: var(--ink);
+    color: white;
+    padding: 0.75rem 1.5rem;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    font-weight: 500;
+    transition: transform 0.3s ease;
+    z-index: 999;
+    white-space: nowrap;
+  }
+  .toast.show { transform: translateX(-50%) translateY(0); }
+  .toast.success { background: var(--success); }
+  .toast.error { background: var(--danger); }
+
+  .progress-bar {
+    height: 4px;
+    background: var(--accent-mid);
+    border-radius: 0;
+  }
+  .progress-fill {
+    height: 100%;
+    background: var(--accent);
+    width: 0%;
+    transition: width 0.3s;
+  }
+
+  .config-banner {
+    background: var(--warn-bg);
+    border: 1px solid #f0c060;
+    border-radius: 8px;
+    padding: 0.75rem 1rem;
+    margin-bottom: 1rem;
+    font-size: 0.85rem;
+    color: var(--warn);
+    display: flex;
+    gap: 0.5rem;
+    align-items: flex-start;
+  }
+  .config-banner strong { font-weight: 600; }
+
+  @media (max-width: 600px) {
+    .field-row.cols-2, .field-row.cols-3 { grid-template-columns: 1fr; }
+    .page-header { padding: 1.25rem 1rem 1.2rem; }
+    .section-body { padding: 0.9rem; }
+    .dyn-table { font-size: 0.76rem; }
+  }
+</style>
+</head>
+<body>
+
+<div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
+
+<div class="page-header">
+  <h1>Faculty Self-Appraisal Form</h1>
+  <p>All entries are saved directly to the department spreadsheet</p>
+</div>
+
+<div class="form-container">
+
+  <!-- CONFIG BANNER — admin replaces the URL -->
+  <div class="config-banner">
+    ⚠️ <span><strong>Admin setup required:</strong> Replace <code>YOUR_SCRIPT_URL_HERE</code> in this file's script section with your Google Apps Script Web App URL. See instructions at the bottom of this page.</span>
+  </div>
+
+  <form id="appraisalForm" novalidate>
+
+    <!-- SECTION 1: Personal Info -->
+    <div class="section-card">
+      <div class="section-header">
+        <div class="icon">1</div>
+        <h2>Personal Information</h2>
+      </div>
+      <div class="section-body">
+        <div class="field-row cols-2">
+          <div class="field-group">
+            <label>Full Name *</label>
+            <input type="text" name="name" required placeholder="Dr. / Prof. / Mr. / Ms.">
+          </div>
+          <div class="field-group">
+            <label>Phone Number *</label>
+            <input type="tel" name="phone" required placeholder="+91 XXXXX XXXXX">
+          </div>
+        </div>
+        <div class="field-row cols-2">
+          <div class="field-group">
+            <label>Email Address *</label>
+            <input type="email" name="email" required placeholder="name@college.edu">
+          </div>
+          <div class="field-group">
+            <label>Department</label>
+            <input type="text" name="department" placeholder="e.g. Computer Science">
+          </div>
+        </div>
+        <div class="field-row cols-1">
+          <div class="field-group">
+            <label>Class and Papers Taught</label>
+            <input type="text" name="classPapersTaught" placeholder="e.g. B.Sc. III – Data Structures, Algorithms">
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SECTION 2: Publications -->
+    <div class="section-card">
+      <div class="section-header">
+        <div class="icon">2</div>
+        <h2>Details of Publications (Research Papers)</h2>
+      </div>
+      <div class="section-body">
+        <div style="overflow-x:auto;">
+          <table class="dyn-table" id="pubTable">
+            <thead>
+              <tr>
+                <th>Sr.</th>
+                <th>Title of Paper</th>
+                <th>Journal Name, Page No, Vol. No, Year</th>
+                <th>ISSN/ISBN</th>
+                <th>Impact Factor (with agency)</th>
+                <th>Co-authors</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody id="pubBody"></tbody>
+          </table>
+        </div>
+        <button type="button" class="add-row-btn" onclick="addRow('pubBody', pubCols)">+ Add Row</button>
+      </div>
+    </div>
+
+    <!-- SECTION 3: Publication of Books -->
+    <div class="section-card">
+      <div class="section-header">
+        <div class="icon">3</div>
+        <h2>Publication of Books</h2>
+      </div>
+      <div class="section-body">
+        <div style="overflow-x:auto;">
+          <table class="dyn-table" id="booksTable">
+            <thead>
+              <tr>
+                <th>Sr.</th>
+                <th>Title of Book</th>
+                <th>Year of Publication</th>
+                <th>Publisher</th>
+                <th>ISBN</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody id="booksBody"></tbody>
+          </table>
+        </div>
+        <button type="button" class="add-row-btn" onclick="addRow('booksBody', bookCols)">+ Add Row</button>
+      </div>
+    </div>
+
+    <!-- SECTION 4: Paper Presentation -->
+    <div class="section-card">
+      <div class="section-header">
+        <div class="icon">4</div>
+        <h2>Paper Presentation</h2>
+      </div>
+      <div class="section-body">
+        <div style="overflow-x:auto;">
+          <table class="dyn-table" id="paperTable">
+            <thead>
+              <tr>
+                <th>Sr.</th>
+                <th>Title of Paper</th>
+                <th>From</th>
+                <th>To</th>
+                <th>Organizing Body</th>
+                <th>Place</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody id="paperBody"></tbody>
+          </table>
+        </div>
+        <button type="button" class="add-row-btn" onclick="addRow('paperBody', paperCols)">+ Add Row</button>
+      </div>
+    </div>
+
+    <!-- SECTION 5: Seminars / Workshops / Conferences Attended -->
+    <div class="section-card">
+      <div class="section-header">
+        <div class="icon">5</div>
+        <h2>Participation in Seminars / Workshops / Conferences</h2>
+      </div>
+      <div class="section-body">
+        <div style="overflow-x:auto;">
+          <table class="dyn-table" id="semTable">
+            <thead>
+              <tr>
+                <th>Sr.</th>
+                <th>Name of Conference / Workshop</th>
+                <th>From</th>
+                <th>To</th>
+                <th>Organizing Body</th>
+                <th>Place</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody id="semBody"></tbody>
+          </table>
+        </div>
+        <button type="button" class="add-row-btn" onclick="addRow('semBody', semCols)">+ Add Row</button>
+      </div>
+    </div>
+
+    <!-- SECTION 6: Organizing Workshops/Conferences -->
+    <div class="section-card">
+      <div class="section-header">
+        <div class="icon">6</div>
+        <h2>Organizing Workshops / Conferences</h2>
+      </div>
+      <div class="section-body">
+        <div style="overflow-x:auto;">
+          <table class="dyn-table" id="orgTable">
+            <thead>
+              <tr>
+                <th>Sr.</th>
+                <th>Name of Workshop</th>
+                <th>Dates</th>
+                <th>Your Role</th>
+                <th>Place</th>
+                <th>Sponsor</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody id="orgBody"></tbody>
+          </table>
+        </div>
+        <button type="button" class="add-row-btn" onclick="addRow('orgBody', orgCols)">+ Add Row</button>
+      </div>
+    </div>
+
+    <!-- SECTION 7: Curriculum Designing -->
+    <div class="section-card">
+      <div class="section-header">
+        <div class="icon">7</div>
+        <h2>Curriculum Designing</h2>
+      </div>
+      <div class="section-body">
+        <div style="overflow-x:auto;">
+          <table class="dyn-table" id="currTable">
+            <thead>
+              <tr>
+                <th>Sr.</th>
+                <th>Committee</th>
+                <th>Year</th>
+                <th>University</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody id="currBody"></tbody>
+          </table>
+        </div>
+        <button type="button" class="add-row-btn" onclick="addRow('currBody', currCols)">+ Add Row</button>
+      </div>
+    </div>
+
+    <!-- SECTION 8: Resource Person / Guest Lectures -->
+    <div class="section-card">
+      <div class="section-header">
+        <div class="icon">8</div>
+        <h2>Resource Person / Guest Lectures</h2>
+      </div>
+      <div class="section-body">
+        <div style="overflow-x:auto;">
+          <table class="dyn-table" id="guestTable">
+            <thead>
+              <tr>
+                <th>Sr.</th>
+                <th>Position</th>
+                <th>Workshop / Seminar</th>
+                <th>Organizing Body</th>
+                <th>Place</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody id="guestBody"></tbody>
+          </table>
+        </div>
+        <button type="button" class="add-row-btn" onclick="addRow('guestBody', guestCols)">+ Add Row</button>
+      </div>
+    </div>
+
+    <!-- SECTION 9: Memberships -->
+    <div class="section-card">
+      <div class="section-header">
+        <div class="icon">9</div>
+        <h2>Memberships of Academic Bodies / Organizations</h2>
+      </div>
+      <div class="section-body">
+        <div style="overflow-x:auto;">
+          <table class="dyn-table" id="memTable">
+            <thead>
+              <tr>
+                <th>Sr.</th>
+                <th>Position</th>
+                <th>Organization / Body</th>
+                <th>Membership No.</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody id="memBody"></tbody>
+          </table>
+        </div>
+        <button type="button" class="add-row-btn" onclick="addRow('memBody', memCols)">+ Add Row</button>
+      </div>
+    </div>
+
+    <!-- SECTION 10: College Committees -->
+    <div class="section-card">
+      <div class="section-header">
+        <div class="icon">10</div>
+        <h2>Participation in College Committees</h2>
+      </div>
+      <div class="section-body">
+        <div style="overflow-x:auto;">
+          <table class="dyn-table" id="commTable">
+            <thead>
+              <tr>
+                <th>Sr.</th>
+                <th>Committee</th>
+                <th>Convenor / Member</th>
+                <th>Name of Convenor</th>
+                <th>Activities Done</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody id="commBody"></tbody>
+          </table>
+        </div>
+        <button type="button" class="add-row-btn" onclick="addRow('commBody', commCols)">+ Add Row</button>
+      </div>
+    </div>
+
+    <!-- SECTION 11: Examination Work -->
+    <div class="section-card">
+      <div class="section-header">
+        <div class="icon">11</div>
+        <h2>Examination Work</h2>
+      </div>
+      <div class="section-body">
+        <div style="overflow-x:auto;">
+          <table class="dyn-table" id="examTable">
+            <thead>
+              <tr>
+                <th>Sr.</th>
+                <th>Invigilator / Examiner / Moderator</th>
+                <th>Date</th>
+                <th>Name of Examining Body</th>
+                <th>No. of Answer Books Assessed</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody id="examBody"></tbody>
+          </table>
+        </div>
+        <button type="button" class="add-row-btn" onclick="addRow('examBody', examCols)">+ Add Row</button>
+      </div>
+    </div>
+
+    <div class="submit-area">
+      <button type="submit" class="submit-btn" id="submitBtn">Submit Appraisal Form</button>
+      <p style="margin-top:0.6rem; font-size:0.8rem; color:#666;">Your data will be saved to the department's Google Sheet.</p>
+    </div>
+
+  </form>
+
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const SCRIPT_URL = 'YOUR_SCRIPT_URL_HERE';
+
+const pubCols = ['Title of Paper','Journal Name/Page No/Vol/Year','ISSN/ISBN','Impact Factor','Co-authors'];
+const bookCols = ['Title of Book','Year of Publication','Publisher','ISBN'];
+const paperCols = ['Title of Paper','From','To','Organizing Body','Place'];
+const semCols = ['Name of Conference/Workshop','From','To','Organizing Body','Place'];
+const orgCols = ['Name of Workshop','Dates','Your Role','Place','Sponsor'];
+const currCols = ['Committee','Year','University'];
+const guestCols = ['Position','Workshop/Seminar','Organizing Body','Place'];
+const memCols = ['Position','Organization/Body','Membership No'];
+const commCols = ['Committee','Convenor/Member','Name of Convenor','Activities Done'];
+const examCols = ['Invigilator/Examiner/Moderator','Date','Examining Body','No. of Answer Books Assessed'];
+
+function addRow(tbodyId, cols) {
+  const tbody = document.getElementById(tbodyId);
+  const rowNum = tbody.rows.length + 1;
+  const tr = document.createElement('tr');
+  let html = `<td class="sr-cell">${rowNum}</td>`;
+  cols.forEach(col => {
+    html += `<td><input type="text" placeholder="${col}"></td>`;
+  });
+  html += `<td class="del-cell"><button type="button" class="del-btn" onclick="delRow(this)">✕</button></td>`;
+  tr.innerHTML = html;
+  tbody.appendChild(tr);
+  updateProgress();
+}
+
+function delRow(btn) {
+  const tbody = btn.closest('tbody');
+  btn.closest('tr').remove();
+  Array.from(tbody.rows).forEach((r, i) => {
+    r.cells[0].textContent = i + 1;
+  });
+  updateProgress();
+}
+
+function updateProgress() {
+  const inputs = document.querySelectorAll('input[required]');
+  const filled = Array.from(inputs).filter(i => i.value.trim()).length;
+  document.getElementById('progressFill').style.width = Math.min(100, (filled / inputs.length) * 100) + '%';
+}
+
+document.querySelectorAll('input').forEach(i => i.addEventListener('input', updateProgress));
+
+function getTableData(tbodyId, cols) {
+  const tbody = document.getElementById(tbodyId);
+  return Array.from(tbody.rows).map(row => {
+    const obj = {};
+    cols.forEach((col, i) => {
+      obj[col] = row.cells[i + 1]?.querySelector('input')?.value?.trim() || '';
+    });
+    return obj;
+  }).filter(r => Object.values(r).some(v => v));
+}
+
+function showToast(msg, type) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = 'toast show ' + (type || '');
+  setTimeout(() => t.className = 'toast', 4000);
+}
+
+document.getElementById('appraisalForm').addEventListener('submit', async function(e) {
+  e.preventDefault();
+
+  const name = this.name.value.trim();
+  const phone = this.phone.value.trim();
+  const email = this.email.value.trim();
+
+  if (!name || !phone || !email) {
+    showToast('Please fill in Name, Phone, and Email.', 'error');
+    return;
+  }
+
+  const payload = {
+    name,
+    phone,
+    email,
+    department: this.department.value.trim(),
+    classPapersTaught: this.classPapersTaught.value.trim(),
+    timestamp: new Date().toLocaleString('en-IN', {timeZone: 'Asia/Kolkata'}),
+    publications: getTableData('pubBody', pubCols),
+    books: getTableData('booksBody', bookCols),
+    paperPresentations: getTableData('paperBody', paperCols),
+    seminars: getTableData('semBody', semCols),
+    organizingWorkshops: getTableData('orgBody', orgCols),
+    curriculumDesigning: getTableData('currBody', currCols),
+    guestLectures: getTableData('guestBody', guestCols),
+    memberships: getTableData('memBody', memCols),
+    collegeCommittees: getTableData('commBody', commCols),
+    examinationWork: getTableData('examBody', examCols)
+  };
+
+  if (SCRIPT_URL === 'https://script.google.com/macros/s/AKfycbxUmksi1_atwfhQk_epx2dI6f1nfjmIIWO7CicaAduCBN5tlqr_om4RWNJexSLkc1Sh6Q/exec') {
+    alert('Admin: Please replace YOUR_SCRIPT_URL_HERE with your Google Apps Script URL.\n\nSee the instructions file for setup steps.');
+    return;
+  }
+
+  const btn = document.getElementById('submitBtn');
+  btn.disabled = true;
+  btn.textContent = 'Submitting…';
+
+  try {
+    await fetch(SCRIPT_URL, {
+      method: 'POST',
+      mode: 'no-cors',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+    showToast('✓ Form submitted successfully!', 'success');
+    btn.textContent = 'Submitted ✓';
+    document.getElementById('progressFill').style.width = '100%';
+    setTimeout(() => { if (confirm('Submit another entry?')) { location.reload(); } }, 1500);
+  } catch (err) {
+    showToast('Network error. Please check your connection.', 'error');
+    btn.disabled = false;
+    btn.textContent = 'Submit Appraisal Form';
+  }
+});
+
+['pubBody','booksBody','paperBody','semBody','orgBody','currBody','guestBody','memBody','commBody','examBody'].forEach(id => {
+  const cols = {
+    pubBody: pubCols, booksBody: bookCols, paperBody: paperCols, semBody: semCols,
+    orgBody: orgCols, currBody: currCols, guestBody: guestCols, memBody: memCols,
+    commBody: commCols, examBody: examCols
+  }[id];
+  addRow(id, cols);
+});
+</script>
+
+</body>
+</html>
